@@ -1,3 +1,4 @@
+import { configTable } from "@db/config.schema";
 import { sqliteTable } from "drizzle-orm/sqlite-core";
 import * as T from "drizzle-orm/sqlite-core";
 export const dataTable = sqliteTable("data", {
@@ -13,6 +14,6 @@ export const sensorsTable = sqliteTable("sensors_data", {
   sensor_2: T.int({ mode: "boolean" }),
   sensor_3: T.int({ mode: "boolean" }),
 });
-
+export { configTable };
 export type insert_data = typeof dataTable.$inferInsert;
 export type select_data = typeof dataTable.$inferSelect;
