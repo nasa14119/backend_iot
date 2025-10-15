@@ -3,13 +3,27 @@ import { insert_data } from "@db/schema";
 type Registre = {
   date: Date;
   temp: number;
+  humidity: number;
   capacity: number;
 };
 type ReturnRegistre = Promise<Registre | null>;
 type ReturnNewRegistre = Promise<Registre>;
 type NewRegistre = Omit<insert_data, "date">;
 type SensorData = Record<string, boolean>;
-export abstract class AbstractDataController {
+export interface TypeDataController {
+  new_registre: (input: NewRegistre) => ReturnNewRegistre;
+  get_last_registre: () => ReturnRegistre;
+  get_by_date: (key: Registre["date"]) => ReturnRegistre;
+  update_by_date: (
+    key: Registre["date"],
+    updating: Partial<NewRegistre>
+  ) => ReturnRegistre;
+  delete_by_date: (
+    key: Registre["date"]
+  ) => Promise<(Omit<Registre, "capacity"> & { sensors: SensorData }) | null>;
+  clear_tables(): void;
+}
+export abstract class AbstractDataController implements TypeDataController {
   get_porcentage(sensors_db: SensorData): number {
     const sensors = Object.values(sensors_db);
     return (
@@ -17,16 +31,13 @@ export abstract class AbstractDataController {
     );
   }
   // Create
-  abstract new_registre(new_val: NewRegistre): ReturnNewRegistre;
+  abstract new_registre: TypeDataController["new_registre"];
   // Read
-  abstract get_last_value(): ReturnRegistre;
-  abstract get_by_date(key: Registre["date"]): ReturnRegistre;
+  abstract get_last_registre: TypeDataController["get_last_registre"];
+  abstract get_by_date: TypeDataController["get_by_date"];
   // Update
-  abstract update_registre(
-    key: Registre["date"],
-    updating: Partial<NewRegistre>
-  ): ReturnRegistre;
+  abstract update_by_date: TypeDataController["update_by_date"];
   // Delete
-  abstract delete_by_date(key: Registre["date"]): ReturnRegistre;
-  abstract clear_tables(): void;
+  abstract delete_by_date: TypeDataController["delete_by_date"];
+  abstract clear_tables: TypeDataController["clear_tables"];
 }
