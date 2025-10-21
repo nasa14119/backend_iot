@@ -8,7 +8,7 @@ export type Config = {
   ideal_temp: number;
   ideal_huminity: number;
 };
-const default_vals: Config = {
+export const default_config: Config = {
   board_ip: null,
   ideal_huminity: 2200,
   ideal_temp: 30,
@@ -16,7 +16,7 @@ const default_vals: Config = {
 };
 export const configTable = sqliteTable("config", {
   id: s.int().primaryKey({ autoIncrement: true }),
-  values: s.text({ mode: "json" }).$type<Config>().default(default_vals),
+  values: s.text({ mode: "json" }).$type<Config>().default(default_config),
 });
 
 if (require.main === module) {
@@ -24,12 +24,12 @@ if (require.main === module) {
     const [current] = await db.select().from(configTable);
     console.log(current.values);
     if (!current) {
-      await db.insert(configTable).values({ values: { ...default_vals } });
+      await db.insert(configTable).values({ values: { ...default_config } });
       return;
     }
     await db
       .update(configTable)
-      .set({ values: { ...default_vals, ...current } })
+      .set({ values: { ...default_config, ...current } })
       .where(eq(configTable.id, 1));
   })();
 }
