@@ -2,13 +2,13 @@ import { insert_data } from "@db/schema";
 
 type Registre = {
   date: Date;
-  temp: number;
+  temperature: number;
   humidity: number;
   capacity: number;
 };
 type ReturnRegistre = Promise<Registre | null>;
 type ReturnNewRegistre = Promise<Registre>;
-type NewRegistre = Omit<insert_data, "date">;
+export type NewRegistre = Omit<insert_data, "date">;
 type SensorData = Record<string, boolean>;
 export interface TypeDataController {
   new_registre: (input: NewRegistre) => ReturnNewRegistre;

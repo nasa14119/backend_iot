@@ -27,7 +27,7 @@ class Controller extends AbstractDataController {
       });
       return {
         date: new_val.date,
-        temp: new_val.temp,
+        temperature: new_val.temperature,
         humidity: new_val.humidity,
         capacity: this.get_porcentage(new_val.sensors),
       };
@@ -66,8 +66,8 @@ class Controller extends AbstractDataController {
       });
       return {
         date: new_val.date,
-        temp: new_val.temp,
-        humidity: new_val.temp,
+        temperature: new_val.temperature,
+        humidity: new_val.humidity,
         capacity: this.get_porcentage(new_val.sensors),
       };
     } catch (error) {
@@ -121,7 +121,7 @@ class Controller extends AbstractDataController {
       sensors,
       date: db_val.data.date,
       humidity: db_val.data.humidity,
-      temp: db_val.data.temp,
+      temperature: db_val.data.temperature,
     };
     try {
       await db.delete(dataTable).where(eq(dataTable.date, key));
