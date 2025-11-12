@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { reset } from "drizzle-seed";
 import { db } from "./connection";
 import type { insert_data } from "./schema";
@@ -7,6 +7,8 @@ import {
   AbstractDataController,
   TypeDataController,
 } from "@db/template.controller";
+import { dayEnd, dayStart } from "@formkit/tempo";
+import { SELECT_MONTH } from "@db/utils";
 class Controller extends AbstractDataController {
   new_registre: TypeDataController["new_registre"] = async (registre) => {
     try {
@@ -130,6 +132,14 @@ class Controller extends AbstractDataController {
       console.error("Error while deleting value");
       throw error;
     }
+  };
+  get_today: TypeDataController["get_today"] = async () => {
+    const todayEnd = dayEnd(new Date());
+    const data = await db
+      .select()
+      .from(dataTable)
+      .where(SELECT_MONTH(dataTable.date));
+    return data;
   };
 }
 

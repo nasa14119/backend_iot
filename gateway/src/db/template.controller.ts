@@ -22,6 +22,7 @@ export interface TypeDataController {
     key: Registre["date"]
   ) => Promise<(Omit<Registre, "capacity"> & { sensors: SensorData }) | null>;
   clear_tables(): void;
+  get_today(): Promise<Omit<Registre, "capacity">[]>;
 }
 export abstract class AbstractDataController implements TypeDataController {
   get_porcentage(sensors_db: SensorData): number {
@@ -40,4 +41,5 @@ export abstract class AbstractDataController implements TypeDataController {
   // Delete
   abstract delete_by_date: TypeDataController["delete_by_date"];
   abstract clear_tables: TypeDataController["clear_tables"];
+  abstract get_today: TypeDataController["get_today"];
 }

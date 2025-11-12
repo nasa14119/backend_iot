@@ -1,11 +1,6 @@
-import type { NewRegistre } from "@db/schema";
+import { Registre, type RegistreType } from "@type";
 import registres_db from "@db/data.controller";
-type ESP_RESPONSE = {
-  temperature: number;
-  humidity: number;
-  sensors: boolean[];
-};
-const URL_PATH = `${process.env.GATEWAY}/get_status_`;
+const URL_PATH = `${process.env.GATEWAY}/get_status`;
 const AFTER_SECONDS = 5000;
 class GATEWAT_ERROR extends Error {
   status: number;
@@ -28,17 +23,9 @@ export const registres = async () => {
     if (!res.ok) {
       throw new GATEWAT_ERROR(res.status);
     }
-    const registre: ESP_RESPONSE = await res.json();
-    const sensors: Record<string, boolean> = {};
-    registre.sensors.forEach((sensor, index) => {
-      sensors[`sensor_${index + 1}`] = sensor;
-    });
-    const db_registre: NewRegistre = {
-      temperature: registre.temperature,
-      humidity: registre.humidity,
-      ...sensors,
-    };
-    const result = await registres_db.new_registre(db_registre);
+    const request: RegistreType = await res.json();
+    const new_registre = Registre.parse(request);
+    const result = await registres_db.new_registre(new_registre);
     console.log("Sucess:");
     console.log(result);
   } catch (e) {
@@ -62,4 +49,3 @@ export const registres = async () => {
     // await fetch(`${process.env.SERVER_URL}/helth`);
   }
 };
-registres();

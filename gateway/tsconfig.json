@@ -103,7 +103,8 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "baseUrl": ".",
     "paths": {
-      "@db/*": ["src/db/*"]
+      "@db/*": ["src/db/*"],
+      "@type": ["src/types.ts"]
     }
   }
 }
