@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, lte } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { reset } from "drizzle-seed";
 import { db } from "./connection";
 import type { insert_data } from "./schema";
@@ -7,8 +7,8 @@ import {
   AbstractDataController,
   TypeDataController,
 } from "@db/template.controller";
-import { dayEnd, dayStart } from "@formkit/tempo";
-import { SELECT_MONTH } from "@db/utils";
+import { dayEnd } from "@formkit/tempo";
+import { SELECT_DATE, SELECT_DAY } from "@db/utils";
 class Controller extends AbstractDataController {
   new_registre: TypeDataController["new_registre"] = async (registre) => {
     try {
@@ -39,7 +39,26 @@ class Controller extends AbstractDataController {
     }
   };
   get_by_date: TypeDataController["get_by_date"] = async (key) => {
-    return null;
+    try {
+      const result = await db
+        .select()
+        .from(dataTable)
+        .where(SELECT_DATE(key, dataTable.date))
+        .fullJoin(sensorsTable, eq(dataTable.date, sensorsTable.date));
+      if (!result || result.length <= 0) return null;
+      const parse_result = result
+        .map(({ data, sensors_data }) => {
+          if (!data || !sensors_data) return null;
+          const { date: _, ...sensors } = sensors_data;
+          const capacity = this.get_porcentage(sensors);
+          return { ...data, capacity };
+        })
+        .filter((v) => v !== null);
+      return parse_result;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   };
   update_by_date: TypeDataController["update_by_date"] = async (
     key,
@@ -134,11 +153,11 @@ class Controller extends AbstractDataController {
     }
   };
   get_today: TypeDataController["get_today"] = async () => {
-    const todayEnd = dayEnd(new Date());
+    // const todayEnd = dayEnd(new Date());
     const data = await db
       .select()
       .from(dataTable)
-      .where(SELECT_MONTH(dataTable.date));
+      .where(SELECT_DAY(dataTable.date));
     return data;
   };
 }

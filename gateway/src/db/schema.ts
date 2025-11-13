@@ -14,6 +14,13 @@ export const sensorsTable = sqliteTable("sensors_data", {
   sensor_3: T.int({ mode: "boolean" }).notNull().default(false),
   sensor_4: T.int({ mode: "boolean" }).notNull().default(false),
 });
+export const dataHistory = sqliteTable("history", {
+  stamp: T.int({ mode: "timestamp_ms" }).primaryKey().unique(),
+  date: T.text().notNull(),
+  temperature: T.int().notNull(),
+  humidity: T.numeric({ mode: "number" }).notNull(),
+});
+
 export type insert_data = typeof dataTable.$inferInsert &
   typeof sensorsTable.$inferInsert;
 export type select_data = typeof dataTable.$inferSelect &

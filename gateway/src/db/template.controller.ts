@@ -13,7 +13,7 @@ type SensorData = Record<string, boolean>;
 export interface TypeDataController {
   new_registre: (input: NewRegistre) => ReturnNewRegistre;
   get_last_registre: () => ReturnRegistre;
-  get_by_date: (key: Registre["date"]) => ReturnRegistre;
+  get_by_date: (key: string) => Promise<Registre[] | null>;
   update_by_date: (
     key: Registre["date"],
     updating: Partial<NewRegistre>
