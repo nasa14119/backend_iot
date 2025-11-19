@@ -31,6 +31,7 @@ class Controller extends AbstractDataController {
         .select()
         .from(dataTable)
         .where(SELECT_DATE(key, dataTable.date));
+      if (result.length <= 0) return null;
       return result;
     } catch (error) {
       console.error(error);

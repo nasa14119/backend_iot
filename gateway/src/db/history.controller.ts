@@ -27,14 +27,14 @@ class HistoryController {
     }
   };
   analize_day = async (date: string) => {
-    const month = await dataTable.get_by_date(date);
-    if (!month) {
-      console.error("Month not found returning");
-      console.log(month);
+    const day = await dataTable.get_by_date(date);
+    if (!day) {
+      console.error("Day not found returning");
+      console.log(day);
       return;
     }
 
-    const sum = month.reduce(
+    const sum = day.reduce(
       (
         { hum, temp, pH, soil },
         { temperature, humidity, pH: pH_temp, soil: soil_temp }
@@ -51,10 +51,10 @@ class HistoryController {
         soil: 0,
       }
     );
-    const temp_average = round_two(sum.temp / month.length);
-    const hum_average = round_two(sum.hum / month.length);
-    const pH_average = round_two(sum.pH / month.length);
-    const soil_average = round_two(sum.soil / month.length);
+    const temp_average = round_two(sum.temp / day.length);
+    const hum_average = round_two(sum.hum / day.length);
+    const pH_average = round_two(sum.pH / day.length);
+    const soil_average = round_two(sum.soil / day.length);
     const [err_parse, stamp] = endDayParse(date);
     if (err_parse !== null) throw new Error("Something wrong with date");
     const new_registre: NewRegistreHistory = {
