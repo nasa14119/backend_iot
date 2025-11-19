@@ -2,12 +2,11 @@ import { desc, eq } from "drizzle-orm";
 import { reset } from "drizzle-seed";
 import { db } from "./connection";
 import type { insert_data } from "./schema";
-import { dataTable, sensorsTable } from "./schema";
+import { dataTable } from "./schema";
 import {
   AbstractDataController,
   TypeDataController,
 } from "@db/template.controller";
-import { dayEnd } from "@formkit/tempo";
 import { SELECT_DATE, SELECT_DAY } from "@db/utils";
 class Controller extends AbstractDataController {
   new_registre: TypeDataController["new_registre"] = async (registre) => {
@@ -16,23 +15,11 @@ class Controller extends AbstractDataController {
         date: new Date(),
         ...registre,
       };
-      const new_val = await db.transaction(async (tx) => {
-        const [val_data] = await tx
-          .insert(dataTable)
-          .values({ ...param_registre })
-          .returning();
-        const [{ date, ...sensors }] = await tx
-          .insert(sensorsTable)
-          .values({ ...param_registre, date: val_data.date })
-          .returning();
-        return { ...val_data, sensors };
-      });
-      return {
-        date: new_val.date,
-        temperature: new_val.temperature,
-        humidity: new_val.humidity,
-        capacity: this.get_porcentage(new_val.sensors),
-      };
+      const [val_data] = await db
+        .insert(dataTable)
+        .values({ ...param_registre })
+        .returning();
+      return val_data;
     } catch (error) {
       console.error("Error adding new registre");
       throw error;
@@ -43,18 +30,8 @@ class Controller extends AbstractDataController {
       const result = await db
         .select()
         .from(dataTable)
-        .where(SELECT_DATE(key, dataTable.date))
-        .fullJoin(sensorsTable, eq(dataTable.date, sensorsTable.date));
-      if (!result || result.length <= 0) return null;
-      const parse_result = result
-        .map(({ data, sensors_data }) => {
-          if (!data || !sensors_data) return null;
-          const { date: _, ...sensors } = sensors_data;
-          const capacity = this.get_porcentage(sensors);
-          return { ...data, capacity };
-        })
-        .filter((v) => v !== null);
-      return parse_result;
+        .where(SELECT_DATE(key, dataTable.date));
+      return result;
     } catch (error) {
       console.error(error);
       return null;
@@ -68,29 +45,15 @@ class Controller extends AbstractDataController {
     const [current_val] = await db
       .select()
       .from(dataTable)
-      .where(eq(dataTable.date, key))
-      .fullJoin(sensorsTable, eq(dataTable.date, sensorsTable.date));
+      .where(eq(dataTable.date, key));
     if (!current_val) throw Error("No value found");
     try {
-      const new_val = await db.transaction(async (tx) => {
-        const [data] = await tx
-          .update(dataTable)
-          .set({ ...updating })
-          .where(eq(dataTable.date, key))
-          .returning();
-        const [{ date, ...sensors }] = await tx
-          .update(sensorsTable)
-          .set({ ...updating })
-          .where(eq(sensorsTable.date, key))
-          .returning();
-        return { ...data, sensors };
-      });
-      return {
-        date: new_val.date,
-        temperature: new_val.temperature,
-        humidity: new_val.humidity,
-        capacity: this.get_porcentage(new_val.sensors),
-      };
+      const [data] = await db
+        .update(dataTable)
+        .set({ ...updating })
+        .where(eq(dataTable.date, key))
+        .returning();
+      return data;
     } catch (error) {
       console.error("Update not process");
       throw error;
@@ -98,7 +61,15 @@ class Controller extends AbstractDataController {
   };
   clear_tables: TypeDataController["clear_tables"] = () => {
     try {
-      reset(db, { dataTable, sensorsTable });
+      db.delete(dataTable);
+    } catch (error) {
+      console.error("Deletion not complited");
+      throw error;
+    }
+  };
+  clear_schema: TypeDataController["clear_schema"] = () => {
+    try {
+      reset(db, dataTable);
     } catch (error) {
       console.error("Deletion not complited");
       throw error;
@@ -107,20 +78,12 @@ class Controller extends AbstractDataController {
   get_last_registre: TypeDataController["get_last_registre"] = async () => {
     try {
       const [last_val] = await db
-        .select({
-          data: dataTable,
-          sensors_data: sensorsTable,
-        })
+        .select()
         .from(dataTable)
-        .fullJoin(sensorsTable, eq(dataTable.date, sensorsTable.date))
         .orderBy(desc(dataTable.date))
         .limit(1);
-      if (!last_val.data?.date || !last_val.sensors_data) return null;
-      const { date: _, ...sensors } = last_val.sensors_data;
-      return {
-        ...last_val.data,
-        capacity: this.get_porcentage(sensors),
-      };
+      if (!last_val) return null;
+      return last_val;
     } catch (error) {
       console.error("Error geting value from db");
       throw error;
@@ -131,21 +94,16 @@ class Controller extends AbstractDataController {
       .select()
       .from(dataTable)
       .where(eq(dataTable.date, key))
-      .fullJoin(sensorsTable, eq(dataTable.date, sensorsTable.date))
       .limit(1);
-    if (!db_val || !db_val.data || !db_val.sensors_data) {
+    if (!db_val) {
       console.error(`Value no found ${key}`);
       return null;
     }
-    const { date, ...sensors } = db_val.sensors_data;
-    const deleted: Awaited<ReturnType<TypeDataController["delete_by_date"]>> = {
-      sensors,
-      date: db_val.data.date,
-      humidity: db_val.data.humidity,
-      temperature: db_val.data.temperature,
-    };
     try {
-      await db.delete(dataTable).where(eq(dataTable.date, key));
+      const [deleted] = await db
+        .delete(dataTable)
+        .where(eq(dataTable.date, key))
+        .returning();
       return deleted;
     } catch (error) {
       console.error("Error while deleting value");
