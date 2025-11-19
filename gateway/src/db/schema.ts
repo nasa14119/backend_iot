@@ -5,12 +5,16 @@ export const dataTable = sqliteTable("data", {
   temperature: T.int().notNull(),
   humidity: T.numeric({ mode: "number" }).notNull(),
   level: T.numeric({ mode: "number" }).notNull(),
+  soil: T.numeric({ mode: "number" }).notNull(),
+  pH: T.numeric({ mode: "number" }).notNull(),
 });
 export const dataHistory = sqliteTable("history", {
   stamp: T.int({ mode: "timestamp_ms" }).primaryKey().unique(),
   date: T.text().notNull(),
   temperature: T.int().notNull(),
   humidity: T.numeric({ mode: "number" }).notNull(),
+  soil: T.numeric({ mode: "number" }).notNull(),
+  pH: T.numeric({ mode: "number" }).notNull(),
 });
 
 export type insert_data = typeof dataTable.$inferInsert;

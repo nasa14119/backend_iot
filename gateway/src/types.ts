@@ -3,6 +3,8 @@ export type RegistreType = {
   temperature: number;
   humidity: number;
   level: number;
+  soil: number;
+  pH: number;
 };
 export const Registre = z.object({
   temperature: z.number().max(80),

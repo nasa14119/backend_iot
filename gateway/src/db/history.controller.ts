@@ -35,17 +35,26 @@ class HistoryController {
     }
 
     const sum = month.reduce(
-      ({ hum, temp }, { temperature, humidity }) => ({
+      (
+        { hum, temp, pH, soil },
+        { temperature, humidity, pH: pH_temp, soil: soil_temp }
+      ) => ({
         temp: temp + temperature,
         hum: humidity + hum,
+        pH: pH + pH_temp,
+        soil: soil + soil_temp,
       }),
       {
         temp: 0,
         hum: 0,
+        pH: 0,
+        soil: 0,
       }
     );
     const temp_average = round_two(sum.temp / month.length);
     const hum_average = round_two(sum.hum / month.length);
+    const pH_average = round_two(sum.pH / month.length);
+    const soil_average = round_two(sum.soil / month.length);
     const [err_parse, stamp] = endDayParse(date);
     if (err_parse !== null) throw new Error("Something wrong with date");
     const new_registre: NewRegistreHistory = {
@@ -53,6 +62,8 @@ class HistoryController {
       date,
       humidity: hum_average,
       temperature: temp_average,
+      pH: pH_average,
+      soil: soil_average,
     };
     await db.insert(dataHistory).values(new_registre).onConflictDoUpdate({
       target: dataHistory.stamp,

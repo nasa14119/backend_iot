@@ -5,6 +5,8 @@ type Registre = {
   temperature: number;
   humidity: number;
   level: number;
+  soil: number;
+  pH: number;
 };
 type ReturnRegistre = Promise<Registre | null>;
 type ReturnNewRegistre = Promise<Registre>;
