@@ -1,11 +1,32 @@
 import db from "@db/data.controller";
-import { Elysia } from "elysia";
-import { Registre } from "src/types";
+import history from "@db/history.controller";
+import { Elysia, ValidationError } from "elysia";
+import { querry_date, Registre } from "src/types";
+import z from "zod";
 const app = new Elysia();
 app.get("helth", () => {
   console.log("Petticion got");
   return { status: 200 };
 });
+app.get(
+  "registres/week",
+  ({ query, status }) => {
+    const registres = history.get_week(query.date);
+    if (!registres) return status(404, { error: "Element not found" });
+    return registres;
+  },
+  {
+    query: z.object({
+      date: querry_date,
+    }),
+    error({ code, error, status }) {
+      if (code === "VALIDATION") {
+        return status(400, { error: error.customError });
+      }
+      return { error };
+    },
+  }
+);
 app.post(
   "registre",
   async ({ body }) => {

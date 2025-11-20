@@ -2,8 +2,8 @@ import { db } from "@db/connection";
 import dataTable from "@db/data.controller";
 import { dataHistory } from "@db/schema";
 import { endDayParse, round_two, SELECT_DATE } from "@db/utils";
-import { dayEnd, format } from "@formkit/tempo";
-import { eq } from "drizzle-orm";
+import { dayEnd, format, weekStart } from "@formkit/tempo";
+import { and, eq, gte, lte } from "drizzle-orm";
 type NewRegistreHistory = typeof dataHistory.$inferInsert;
 class HistoryController {
   push_value = async (
@@ -25,6 +25,20 @@ class HistoryController {
       console.error(error);
       throw new Error("Something happend adding value to db");
     }
+  };
+  get_week = async (date: string) => {
+    const [error, day] = endDayParse(date);
+    if (error != null) {
+      console.error(error);
+      return null;
+    }
+    const start = weekStart(day);
+    const registres = await db
+      .select()
+      .from(dataHistory)
+      .where(and(gte(dataHistory.stamp, start), lte(dataHistory.stamp, day)));
+    if (!registres || registres.length <= 0) return null;
+    return registres;
   };
   analize_day = async (date: string) => {
     const day = await dataTable.get_by_date(date);
