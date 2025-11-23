@@ -5,8 +5,9 @@ const app = new Elysia();
 function start_tunnel() {
   const tunnel = new Worker("./src/tunnel_worker.ts", { ref: false });
   const close = () => {
-    tunnel.postMessage("close");
     app.stop();
+    tunnel.addEventListener("close", () => process.exit(0));
+    tunnel.postMessage("close");
   };
   process.on("SIGINT", close); // Ctrl+C
   process.on("SIGTERM", close); // system stop

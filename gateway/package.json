@@ -3,7 +3,8 @@
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch index.ts"
+    "dev": "bun run --watch index.ts",
+    "build": "NODE_ENV=production bun build --target bun ./index.ts --outdir dist"
   },
   "dependencies": {
     "@formkit/tempo": "^0.1.2",
