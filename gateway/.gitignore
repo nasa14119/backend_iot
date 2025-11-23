@@ -43,3 +43,6 @@ package-lock.json
 **/*.bun
 **/drizzle/*
 **/*.db
+
+# Tunnel credentials 
+**/tunnel-temp.json
