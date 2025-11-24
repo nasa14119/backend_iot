@@ -1,3 +1,4 @@
+import dataController from "@db/data.controller";
 import db from "@db/data.controller";
 import history from "@db/history.controller";
 import { Elysia } from "elysia";
@@ -14,6 +15,11 @@ app.get("registre", async ({ status }) => {
   const registre = await db.get_last_registre();
   if (!registre) return status(204);
   return registre;
+});
+app.get("registres/day", async ({ status }) => {
+  const registres = await dataController.get_today();
+  if (!registres) return status(204);
+  return registres;
 });
 app.get(
   "registres/week",

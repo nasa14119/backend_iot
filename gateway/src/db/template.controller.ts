@@ -23,7 +23,7 @@ export interface TypeDataController {
   delete_by_date: (key: Registre["date"]) => Promise<Registre | null>;
   clear_tables: ClearFun;
   clear_schema: ClearFun;
-  get_today(): Promise<Omit<Registre, "capacity">[]>;
+  get_today(): Promise<Omit<Registre, "level">[] | null>;
 }
 export abstract class AbstractDataController implements TypeDataController {
   // Create

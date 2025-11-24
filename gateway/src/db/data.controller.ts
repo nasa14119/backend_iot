@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { reset } from "drizzle-seed";
 import { db } from "./connection";
 import type { insert_data } from "./schema";
@@ -116,8 +116,13 @@ class Controller extends AbstractDataController {
     const data = await db
       .select()
       .from(dataTable)
-      .where(SELECT_DAY(dataTable.date));
-    return data;
+      .where(SELECT_DAY(dataTable.date))
+      .orderBy(asc(dataTable.date));
+    if (!data || data.length <= 0) return null;
+    return data.map((v) => {
+      const { level, ...val } = v;
+      return val;
+    });
   };
 }
 
