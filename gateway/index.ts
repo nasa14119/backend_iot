@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import routes from "./src/routes";
 import cron_rutines from "./src/cron_rutines";
+import cors from "@elysiajs/cors";
 const app = new Elysia();
 function start_tunnel() {
   const tunnel = new Worker("./src/tunnel_worker.ts", { ref: false });
@@ -13,6 +14,7 @@ function start_tunnel() {
   process.on("SIGTERM", close); // system stop
   process.on("SIGHUP", close);
 }
+app.use(cors());
 app.use(routes);
 app.use(cron_rutines);
 app.listen(process.env.PORT ?? 4000);
