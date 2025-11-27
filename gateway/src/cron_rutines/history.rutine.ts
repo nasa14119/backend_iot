@@ -3,6 +3,7 @@ import { round_two } from "@db/utils";
 import controller from "@db/history.controller";
 export const history_rutine = async () => {
   const day = await db.get_today();
+  if (!day) return;
   const sum = day.reduce(
     (
       { hum, temp, pH, soil },

@@ -98,6 +98,11 @@ class HistoryController {
     }
     return db_result[0];
   };
+  get_all = async () => {
+    const db_result = await db.select().from(dataHistory);
+    if (!db_result || db_result.length <= 0) return null;
+    return db_result;
+  };
   clear_db = async () => {
     await db.delete(dataHistory);
   };

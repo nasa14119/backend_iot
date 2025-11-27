@@ -2,6 +2,7 @@ import { spawn, $ } from "bun";
 import { randomUUID } from "crypto";
 import { writeFileSync } from "fs";
 declare var self: Worker;
+let is_closing = false;
 const check_process_env = () => {
   const KEYS = [
     "THINGSPEAK",
@@ -51,6 +52,8 @@ async function init_tunnel() {
   );
   await fetch(`${process.env.THINGSPEAK}${FIELD}=${subdomain}`);
   const close = async () => {
+    if (is_closing) return;
+    is_closing = true;
     type DNSRecords = { id: string; name: string }[];
     tunnel.kill();
     console.log("\nDeleting tunnel");
