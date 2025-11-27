@@ -22,6 +22,10 @@ export const SELECT_DAY = (column: any) => {
   const todayEnd = dayEnd(now);
   return and(gte(column, todayStart), lte(column, todayEnd));
 };
+export const SELECT_UNTIL_DAY = (day: Date, column: any) => {
+  const day_end = dayEnd(day);
+  return lte(column, day_end);
+};
 export const SELECT_DATE = (date: string, column: any) => {
   const [error, day] = check_date_format(date);
   if (error !== null) throw new Error(error);

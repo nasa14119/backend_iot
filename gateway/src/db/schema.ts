@@ -16,8 +16,14 @@ export const dataHistory = sqliteTable("history", {
   soil: T.numeric({ mode: "number" }).notNull(),
   pH: T.numeric({ mode: "number" }).notNull(),
 });
-
+export const bombTable = sqliteTable("water", {
+  stamp: T.int({ mode: "timestamp_ms" }).primaryKey().unique(),
+  success: T.int({ mode: "boolean" }).notNull(),
+  new_level: T.numeric({ mode: "number" }).notNull(),
+  soil: T.numeric({ mode: "number" }).notNull(),
+});
 export type insert_data = typeof dataTable.$inferInsert;
 export type select_data = typeof dataTable.$inferSelect;
 import type { NewRegistre } from "./template.controller";
 export { NewRegistre };
+export type BombRegistre = Required<typeof bombTable.$inferInsert>;
