@@ -46,3 +46,4 @@ package-lock.json
 
 # Tunnel credentials 
 **/tunnel-temp.json
+**/config.yml
