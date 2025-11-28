@@ -8,6 +8,9 @@ export type RegistreType = {
   soil: number;
   pH: number;
 };
+export type Notification = {
+  message: string;
+};
 export const Registre = z.object({
   temperature: z.number().max(80),
   humidity: z.number().max(100).min(1),
@@ -30,7 +33,6 @@ export const RegistreRaw = z
       soil: round_two(convert_soil(v.soil)),
     };
   });
-
 export const querry_date = z
   .string()
   .regex(

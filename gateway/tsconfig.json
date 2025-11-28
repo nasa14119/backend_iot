@@ -104,7 +104,8 @@
     "baseUrl": ".",
     "paths": {
       "@db/*": ["src/db/*"],
-      "@type": ["src/types.ts"]
+      "@type": ["src/types.ts"],
+      "@notifications/*": ["src/notification/*"]
     }
   }
 }
