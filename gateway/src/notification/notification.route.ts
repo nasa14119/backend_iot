@@ -1,4 +1,6 @@
-import { NotificationDB } from "@notifications/notification.controller";
+import notificationController, {
+  NotificationDB,
+} from "@notifications/notification.controller";
 import Elysia from "elysia";
 
 const IntervalSeconds = 30 * 1000;
@@ -11,18 +13,17 @@ class Observer {
     }, IntervalSeconds);
     this.connections = [];
   }
-  triggerEvent(noti: NotificationDB) {
+  triggerEvent(noti: NotificationDB | null) {
     this.connections.forEach((ws) => {
       ws.send(JSON.stringify(noti));
     });
   }
   addObserver(ws: WS) {
     this.connections.push(ws);
-    console.log(ws.id);
   }
   pingObservers() {
     this.connections.forEach((ws) => {
-      ws.ping();
+      ws.ping("ping");
     });
   }
   removeObserver(id: string) {
@@ -37,10 +38,22 @@ const route = new Elysia({
 });
 route.ws("/notifications", {
   open(ws) {
+    notificationController
+      .get_last_notification()
+      .then((v) => ws.send(JSON.stringify(v)));
     notificationObserver.addObserver(ws);
   },
   close(ws) {
     notificationObserver.removeObserver(ws.id);
   },
+});
+route.get("/notifications", async ({ status }) => {
+  const data = await notificationController.get_all_notifications();
+  if (data === null) return status(204);
+  return status(200, data);
+});
+route.delete("/notifications", async ({ status }) => {
+  await notificationController.clear_db();
+  return status(204);
 });
 export default route;

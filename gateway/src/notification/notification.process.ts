@@ -44,6 +44,7 @@ async function init_mqtt(callBack: Callback): Promise<void> {
       const mss = payload.toString();
       try {
         const data = ResponseThing.parse(JSON.parse(mss));
+        data.id = Bun.randomUUIDv7();
         callBack(data);
       } catch (error) {
         const zod_error = error as ZodError;
