@@ -24,6 +24,7 @@ async function init_mqtt(callBack: Callback): Promise<void> {
     password: process.env.MQTT_PASSWORD,
     port: 1883,
     protocol: "mqtt",
+    keepalive: 60,
   });
   const { promise, resolve } = Promise.withResolvers<void>();
   console.log("Starting mqtt conection");
