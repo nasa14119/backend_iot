@@ -2,6 +2,8 @@ import { Elysia } from "elysia";
 import routes from "./src/routes";
 import cron_rutines from "./src/cron_rutines";
 import cors from "@elysiajs/cors";
+import { init_notifications } from "@notifications/index";
+init_notifications();
 const app = new Elysia();
 function start_tunnel() {
   const tunnel = new Worker("./src/tunnel_worker.ts", { ref: false });

@@ -2,6 +2,7 @@ import dataController from "@db/data.controller";
 import { Elysia } from "elysia";
 import { Registre, RegistreRaw } from "src/types";
 import registres_routes from "./registres.routes";
+import notification_routes from "@notifications/notification.route";
 const app = new Elysia();
 // General Porpuse
 app.get("/", () => {
@@ -10,6 +11,7 @@ app.get("/", () => {
 app.get("helth", () => {
   return { status: 200 };
 });
+app.use(notification_routes);
 // Registres sub router
 app.use(registres_routes);
 app.get("registre", async ({ status }) => {
