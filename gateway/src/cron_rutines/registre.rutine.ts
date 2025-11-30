@@ -37,7 +37,7 @@ export const registres = async () => {
     } = RegistreRaw.safeParse(request);
     if (!success) throw new GATEWAT_ERROR(1400, error.message);
     const result = await registres_db.new_registre(new_registre);
-    console.log("Sucess:");
+    console.log("Success:");
     console.log(result);
   } catch (e) {
     const error = e as Record<string, any>;
