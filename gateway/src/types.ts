@@ -9,6 +9,8 @@ export type RegistreType = {
   pH: number;
 };
 export type Notification = {
+  prioridad: "none" | "warning" | "error";
+  source: string;
   message: string;
 };
 export const Registre = z.object({
