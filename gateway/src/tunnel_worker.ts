@@ -29,7 +29,9 @@ async function init_tunnel() {
   await $`rm -f ${credentials}`;
   const server = `http://localhost:${process.env.PORT ?? 4000}`;
   const creation =
-    await $`cloudflared tunnel create --credentials-file ${credentials} tunnel-temp`.quiet();
+    await $`cloudflared tunnel create --credentials-file ${credentials} ${
+      process.env.TUNNEL_NAME ?? "tunnel-temp"
+    }`.quiet();
   const output = creation.text().match(regex_tunnel);
   if (!output) throw new Error("error creating tunnel");
   const TUNNEL_ID = output[0];
