@@ -3,8 +3,9 @@ import Elysia from "elysia";
 import bombController from "@db/bomb.controller";
 import { ESP_TIMEOUT, SHODULE } from "src/const";
 import { RegistreType } from "@type";
+import dataController from "@db/data.controller";
+import { registres } from "src/cron_rutines/registre.rutine";
 const URL_TRIGGER = `${process.env.GATEWAY}/water-plant`;
-const URL_GET_REGISTRE = `${process.env.GATEWAY}/get_status`;
 export const WATER_SCHODULE = (app: Elysia) => {
   return SHODULE.forEach((time_of_day) =>
     app.use(
@@ -17,6 +18,7 @@ export const WATER_SCHODULE = (app: Elysia) => {
   );
 };
 async function water_rutine() {
+  console.log("Wattering the plant");
   if (!process.env.GATEWAY) throw Error("Gateway ENV not found");
   if (!(await bombController.can_water())) {
     console.log("Skiping water because water before");
@@ -27,9 +29,9 @@ async function water_rutine() {
       signal: AbortSignal.timeout(ESP_TIMEOUT),
     });
     const success = res.ok;
-    const last_values = (await fetch(URL_TRIGGER, {
-      signal: AbortSignal.timeout(ESP_TIMEOUT),
-    }).then((v) => v.json())) as RegistreType;
+    await registres();
+    const last_values =
+      (await dataController.get_last_registre()) as NonNullable<RegistreType>;
     await bombController.push_value({
       new_level: last_values.level,
       soil: last_values.soil,
@@ -41,7 +43,7 @@ async function water_rutine() {
     if (error.name === "TimeoutError") {
       console.error("Esp timeout couldn't get answer");
     }
+    console.log(error);
     return;
   }
 }
-water_rutine();
