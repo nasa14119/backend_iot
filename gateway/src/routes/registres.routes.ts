@@ -3,6 +3,7 @@ import Elysia from "elysia";
 import { querry_date } from "@type";
 import dataController from "@db/data.controller";
 import historyController from "@db/history.controller";
+import { water_rutine } from "src/cron_rutines/water.rutine";
 
 const route = new Elysia();
 route.get("registres", async ({ status }) => {
@@ -34,6 +35,10 @@ route.get(
     },
   }
 );
+route.get("water-plant", async ({ status }) => {
+  await water_rutine();
+  return status(204);
+});
 route.get(
   "registres/month",
   async ({ query, status }) => {

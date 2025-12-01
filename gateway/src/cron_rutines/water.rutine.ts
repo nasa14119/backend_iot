@@ -17,7 +17,7 @@ export const WATER_SCHODULE = (app: Elysia) => {
     )
   );
 };
-async function water_rutine() {
+export async function water_rutine() {
   console.log("Wattering the plant");
   if (!process.env.GATEWAY) throw Error("Gateway ENV not found");
   if (!(await bombController.can_water())) {
@@ -27,6 +27,8 @@ async function water_rutine() {
   try {
     const res = await fetch(URL_TRIGGER, {
       signal: AbortSignal.timeout(ESP_TIMEOUT),
+    }).catch(() => {
+      throw { name: "TimeoutError" };
     });
     const success = res.ok;
     await registres();
@@ -42,6 +44,7 @@ async function water_rutine() {
     const error = err as Record<string, string>;
     if (error.name === "TimeoutError") {
       console.error("Esp timeout couldn't get answer");
+      return;
     }
     console.log(error);
     return;
