@@ -25,6 +25,7 @@ async function init_mqtt(callBack: Callback): Promise<void> {
     port: 1883,
     protocol: "mqtt",
     keepalive: 60,
+    reconnectPeriod: 2000,
   });
   const { promise, resolve } = Promise.withResolvers<void>();
   console.log("Starting mqtt conection");
@@ -39,6 +40,12 @@ async function init_mqtt(callBack: Callback): Promise<void> {
         console.error(err);
         throw new Error("Error in mqtt conextion");
       }
+    });
+    conexion.on("disconnect", () => {
+      console.log("mqtt disconected...");
+    });
+    conexion.on("reconnect", () => {
+      console.log("conection restore");
     });
     conexion.on("message", (_, payload) => {
       const mss = payload.toString();
