@@ -2,7 +2,7 @@ import { db } from "@db/connection";
 import dataTable from "@db/data.controller";
 import { dataHistory } from "@db/schema";
 import { endDayParse, round_two, SELECT_DATE } from "@db/utils";
-import { dayEnd, format, weekStart } from "@formkit/tempo";
+import { dayEnd, format, monthStart, weekStart } from "@formkit/tempo";
 import { and, eq, gte, lte } from "drizzle-orm";
 type NewRegistreHistory = typeof dataHistory.$inferInsert;
 class HistoryController {
@@ -33,6 +33,20 @@ class HistoryController {
       return null;
     }
     const start = weekStart(day);
+    const registres = await db
+      .select()
+      .from(dataHistory)
+      .where(and(gte(dataHistory.stamp, start), lte(dataHistory.stamp, day)));
+    if (!registres || registres.length <= 0) return null;
+    return registres;
+  };
+  get_month = async (date: string) => {
+    const [error, day] = endDayParse(date);
+    if (error != null) {
+      console.error(error);
+      return null;
+    }
+    const start = monthStart(day);
     const registres = await db
       .select()
       .from(dataHistory)

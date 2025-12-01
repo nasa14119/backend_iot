@@ -19,7 +19,26 @@ route.get(
   "registres/week",
   async ({ query, status }) => {
     const registres = await historyController.get_week(query.date);
-    if (!registres) return status(404, { error: "Element not found" });
+    if (!registres) return status(204);
+    return registres;
+  },
+  {
+    query: z.object({
+      date: querry_date,
+    }),
+    error({ code, error, status }) {
+      if (code === "VALIDATION") {
+        return status(400, { error: error.customError });
+      }
+      return { error };
+    },
+  }
+);
+route.get(
+  "registres/month",
+  async ({ query, status }) => {
+    const registres = await historyController.get_month(query.date);
+    if (!registres) return status(204);
     return registres;
   },
   {
