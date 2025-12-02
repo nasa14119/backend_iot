@@ -40,6 +40,19 @@ class NotificationsController {
     if (!notifications || notifications.length <= 0) return null;
     return notifications;
   }
+  async push_notification_server(
+    new_value: Omit<Required<NotificationDB>, "stamp">
+  ) {
+    const now = new Date();
+    const new_val = { stamp: now, ...new_value };
+    await db
+      .insert(notificationTable)
+      .values(new_val)
+      .onConflictDoUpdate({
+        target: notificationTable.id,
+        set: { data: new_val.data, stamp: now },
+      });
+  }
   async push_notification_from_code(registre: ResponseThing) {
     const new_notification = get_notification_code(registre.type);
     const result = await db

@@ -17,6 +17,14 @@ class BombControler {
     if (!last_val || last_val.length <= 0) return null;
     return last_val[0];
   };
+  get_all_registres = async () => {
+    const last_val = await db
+      .select()
+      .from(bombTable)
+      .orderBy(desc(bombTable.stamp));
+    if (!last_val || last_val.length <= 0) return null;
+    return last_val;
+  };
   can_water = async (): Promise<boolean> => {
     const now = new Date();
     const last_value = await this.get_last_registre();

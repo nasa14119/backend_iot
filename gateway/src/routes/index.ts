@@ -1,8 +1,9 @@
 import dataController from "@db/data.controller";
 import { Elysia } from "elysia";
-import { Registre, RegistreRaw } from "src/types";
 import registres_routes from "./registres.routes";
+import water_routes from "./water.routes";
 import notification_routes from "@notifications/notification.route";
+import registre_routes from "./registre.routes";
 const app = new Elysia();
 // General Porpuse
 app.get("/", () => {
@@ -11,62 +12,12 @@ app.get("/", () => {
 app.get("helth", () => {
   return { status: 200 };
 });
+// Routers
 app.use(notification_routes);
-// Registres sub router
+app.use(water_routes);
 app.use(registres_routes);
-app.get("registre", async ({ status }) => {
-  const registre = await dataController.get_last_registre();
-  if (!registre) return status(204);
-  return registre;
-});
-app.post(
-  "registre",
-  async ({ body }) => {
-    const value = await dataController.new_registre(body);
-    return value;
-  },
-  {
-    body: Registre,
-    error: ({ status, error, code }) => {
-      if (code === "PARSE") {
-        return status(400, {
-          error: "Error parsing body",
-        });
-      }
-      if (code === "VALIDATION") {
-        return status(400, {
-          field: error.valueError?.path[0],
-          error: error.valueError?.message,
-        });
-      }
-      return status(500, { error: "Something unexpected happend" });
-    },
-  }
-);
-app.post(
-  "registre/raw",
-  async ({ body }) => {
-    const value = await dataController.new_registre(body);
-    return value;
-  },
-  {
-    body: RegistreRaw,
-    error: ({ status, error, code }) => {
-      if (code === "PARSE") {
-        return status(400, {
-          error: "Error parsing body",
-        });
-      }
-      if (code === "VALIDATION") {
-        return status(400, {
-          field: error.valueError?.path[0],
-          error: error.valueError?.message,
-        });
-      }
-      return status(500, { error: "Something unexpected happend" });
-    },
-  }
-);
+app.use(registre_routes);
+// Global routes
 app.delete("/db/clear", ({ body, status }) => {
   const { password } = body as { password: string };
   if (!password) return status(400);

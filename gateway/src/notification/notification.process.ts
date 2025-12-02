@@ -17,7 +17,8 @@ const ResponseThing = z
   });
 export type ResponseThing = z.infer<typeof ResponseThing>;
 type Callback = (mss: ResponseThing) => void;
-async function init_mqtt(callBack: Callback): Promise<void> {
+type Publish = (type: NOTIFICATION_CODES) => void;
+async function init_mqtt(callBack: Callback): Promise<Publish> {
   const conexion = mqtt.connect("mqtt://mqtt3.thingspeak.com", {
     clientId: process.env.MQTT_USERNAME,
     username: process.env.MQTT_USERNAME,
@@ -28,7 +29,7 @@ async function init_mqtt(callBack: Callback): Promise<void> {
     reconnectPeriod: 2000,
     connectTimeout: 20_0000,
   });
-  const { promise, resolve } = Promise.withResolvers<void>();
+  const { promise, resolve } = Promise.withResolvers<Publish>();
   console.log("Starting mqtt conection");
   conexion.on("error", () => {
     console.error("error in mqtt conection");
@@ -60,7 +61,10 @@ async function init_mqtt(callBack: Callback): Promise<void> {
         );
       }
     });
-    resolve();
+    resolve((noti) => {
+      const payload = `field1=${Bun.randomUUIDv7()}&field2=${noti}`;
+      conexion.publish(`channels/${process.env.MQTT_ID}/subscribe`, payload);
+    });
   });
   return promise;
 }
