@@ -10,7 +10,7 @@ export type RegistreType = {
 };
 export type Notification = {
   prioridad: "none" | "warning" | "error";
-  source: string;
+  source: "PUMP" | "MOTOR";
   message: string;
 };
 export const Registre = z.object({

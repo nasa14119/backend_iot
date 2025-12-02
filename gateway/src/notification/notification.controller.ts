@@ -11,15 +11,15 @@ function get_notification_code(type: NOTIFICATION_CODES): Notification {
   notification.message = TYPES_NOTIFICATION[type];
   if (type === "WATER_ERROR") {
     notification.prioridad = "error";
-    notification.source = "Error en la bomba de agua";
+    notification.source = "PUMP";
   }
   if (type === "WATER_COOLDOWN_SHECHULE") {
     notification.prioridad = "warning";
-    notification.source = "Advertencia en la bomba de agua";
+    notification.source = "PUMP";
   }
   if (type === "SERVO_OPEN" || type === "SERVO_CLOSE") {
     notification.prioridad = "none";
-    notification.source = "Aviso de las ventanas";
+    notification.source = "MOTOR";
   }
   return notification as Notification;
 }
