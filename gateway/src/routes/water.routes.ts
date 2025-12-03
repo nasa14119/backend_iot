@@ -1,4 +1,5 @@
 import bombController from "@db/bomb.controller";
+import dataController from "@db/data.controller";
 import { querry_date } from "@type";
 import Elysia from "elysia";
 import { water_rutine } from "src/cron_rutines/water.rutine";
@@ -7,6 +8,16 @@ import z from "zod";
 const route = new Elysia();
 route.get("water/trigger", async ({ status }) => {
   await water_rutine();
+  return status(204);
+});
+route.get("water/check", async ({ status }) => {
+  const registre = await dataController.get_last_registre();
+  if (registre === null) return status(503);
+  await bombController.push_value({
+    new_level: registre.level,
+    soil: registre.soil,
+    success: "check",
+  });
   return status(204);
 });
 route.get("water", async ({ status }) => {

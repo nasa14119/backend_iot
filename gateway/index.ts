@@ -18,7 +18,7 @@ function start_tunnel() {
 }
 app.use(cors());
 app.use(routes);
-app.use(cron_rutines);
+// app.use(cron_rutines);
 app.listen(process.env.PORT ?? 4000);
 if (process.env.NODE_ENV === "production") {
   start_tunnel();

@@ -30,7 +30,10 @@ class BombControler {
     const last_value = await this.get_last_registre();
     if (!last_value) return true;
     const time = addMinute(last_value.stamp, WATER_COOLDOWN);
-    return isAfter(now, time) && last_value.success;
+    return (
+      last_value.success == "check" ||
+      (isAfter(now, time) && last_value.success !== "error")
+    );
   };
   push_value = async (new_registre: NewBombRegistre) => {
     const now = new Date();

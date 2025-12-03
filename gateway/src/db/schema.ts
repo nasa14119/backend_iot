@@ -19,7 +19,7 @@ export const dataHistory = sqliteTable("history", {
 });
 export const bombTable = sqliteTable("water", {
   stamp: T.int({ mode: "timestamp_ms" }).primaryKey().unique(),
-  success: T.int({ mode: "boolean" }).notNull(),
+  success: T.text("status", { enum: ["success", "error", "check"] }).notNull(),
   new_level: T.numeric({ mode: "number" }).notNull(),
   soil: T.numeric({ mode: "number" }).notNull(),
 });
