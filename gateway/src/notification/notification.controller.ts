@@ -9,6 +9,10 @@ export type NotificationDB = typeof notificationTable.$inferInsert;
 function get_notification_code(type: NOTIFICATION_CODES): Notification {
   let notification: Partial<Notification> = {};
   notification.message = TYPES_NOTIFICATION[type];
+  if (type === "WATER_SUCCESS") {
+    notification.prioridad = "none";
+    notification.source = "PUMP";
+  }
   if (type === "WATER_ERROR") {
     notification.prioridad = "error";
     notification.source = "PUMP";
@@ -40,11 +44,13 @@ class NotificationsController {
     if (!notifications || notifications.length <= 0) return null;
     return notifications;
   }
-  async push_notification_server(
-    new_value: Omit<Required<NotificationDB>, "stamp">
-  ) {
+  async push_notification_server(type: NOTIFICATION_CODES) {
     const now = new Date();
-    const new_val = { stamp: now, ...new_value };
+    const new_val: NotificationDB = {
+      id: Bun.randomUUIDv7(),
+      stamp: now,
+      data: get_notification_code(type),
+    };
     await db
       .insert(notificationTable)
       .values(new_val)

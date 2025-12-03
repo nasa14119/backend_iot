@@ -5,7 +5,7 @@ import { addMinute, isAfter } from "@formkit/tempo";
 import { desc } from "drizzle-orm";
 type NewBombRegistre = Omit<BombRegistre, "stamp">;
 const WATER_COOLDOWN = process.env.BOMB_COOLDOWN_MINUTES
-  ? Number(process.env.BOMB_COOLDOWN)
+  ? Number(process.env.BOMB_COOLDOWN_MINUTES)
   : 1;
 class BombControler {
   get_last_registre = async () => {

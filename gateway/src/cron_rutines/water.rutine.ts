@@ -5,7 +5,7 @@ import { ESP_TIMEOUT, SHODULE } from "src/const";
 import { RegistreType } from "@type";
 import dataController from "@db/data.controller";
 import { registres } from "src/cron_rutines/registre.rutine";
-import { publish } from "index";
+import notificationController from "@notifications/notification.controller";
 const URL_TRIGGER = `${process.env.GATEWAY}/water-plant`;
 export const WATER_SCHODULE = (app: Elysia) => {
   return SHODULE.forEach((time_of_day) =>
@@ -23,7 +23,7 @@ export async function water_rutine() {
   if (!process.env.GATEWAY) throw Error("Gateway ENV not found");
   if (!(await bombController.can_water())) {
     console.log("Skiping water because water before");
-    publish("WATER_COOLDOWN_SHECHULE");
+    notificationController.push_notification_server("WATER_COOLDOWN_SHECHULE");
     return;
   }
   try {
@@ -41,10 +41,12 @@ export async function water_rutine() {
       soil: last_values.soil,
       success,
     });
-    success ? publish("WATER_SUCCESS") : publish("WATER_ERROR");
+    success
+      ? notificationController.push_notification_server("WATER_SUCCESS")
+      : notificationController.push_notification_server("WATER_ERROR");
   } catch (err) {
     const error = err as Record<string, string>;
-    publish("WATER_ERROR");
+    notificationController.push_notification_server("WATER_ERROR");
     if (error.name === "TimeoutError") {
       console.error("Esp timeout couldn't get answer");
       return;

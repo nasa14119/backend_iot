@@ -6,14 +6,14 @@ import { WATER_SCHODULE } from "src/cron_rutines/water.rutine";
 const rutines = new Elysia();
 const EVERY_MINUTES = timer.everyMinutes(1);
 const EVERY_NIGHT = timer.EVERY_DAY_AT_MIDNIGHT;
-// WATER_SCHODULE(rutines);
-// rutines.use(
-//   cron({
-//     name: "registres",
-//     pattern: EVERY_MINUTES,
-//     run: registres,
-//   })
-// );
+WATER_SCHODULE(rutines);
+rutines.use(
+  cron({
+    name: "registres",
+    pattern: EVERY_MINUTES,
+    run: registres,
+  })
+);
 // rutines.use(
 //   cron({
 //     name: "history",
