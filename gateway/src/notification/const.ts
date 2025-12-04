@@ -1,5 +1,5 @@
 export const TYPES_NOTIFICATION = {
-  WATER_ERROR: "Error al memoento de regar las plantas, revisar la bomba",
+  WATER_ERROR: "Error al momento de regar las plantas, revisar la bomba",
   WATER_COOLDOWN_SHECHULE:
     "Las plantas fueron regadas hace poco saltando la regada programada",
   WATER_SUCCESS: "Las plantas fueron regadas con exito",

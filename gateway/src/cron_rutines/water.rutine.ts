@@ -30,10 +30,11 @@ export async function water_rutine() {
     const res = await fetch(URL_TRIGGER, {
       signal: AbortSignal.timeout(ESP_TIMEOUT),
     }).catch(() => {
-      throw { name: "TimeoutError" };
+      return { ok: false };
+      // throw { name: "TimeoutError" };
     });
-    const success = res.ok;
-    await registres();
+    const success = res.ok ? "success" : "error";
+    // await registres();
     const last_values =
       (await dataController.get_last_registre()) as NonNullable<RegistreType>;
     await bombController.push_value({
@@ -41,7 +42,7 @@ export async function water_rutine() {
       soil: last_values.soil,
       success,
     });
-    success
+    success === "success"
       ? notificationController.push_notification_server("WATER_SUCCESS")
       : notificationController.push_notification_server("WATER_ERROR");
   } catch (err) {
